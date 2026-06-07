@@ -1,6 +1,6 @@
 import { Package } from '../types';
-import { statusColor, statusLabel } from '../utils/helpers';
-import { X, MapPin, User, Calendar, Package as PackageIcon } from 'lucide-react';
+import { statusColor, statusLabel, isOverdue, getDisplayColor, overdueLabel, overdueColor } from '../utils/helpers';
+import { X, MapPin, User, Calendar, Package as PackageIcon, Clock } from 'lucide-react';
 
 interface Props {
   pkg: Package | null;
@@ -42,16 +42,25 @@ export default function DetailCard({ pkg, onClose }: Props) {
       </div>
 
       <div className="mt-3 flex items-center gap-2">
+        {isOverdue(pkg) && (
+          <span
+            className="px-2 py-0.5 rounded text-xs text-white font-medium flex items-center gap-1"
+            style={{ backgroundColor: overdueColor }}
+          >
+            <Clock className="w-3 h-3" />
+            {overdueLabel}
+          </span>
+        )}
         <span
           className="px-2 py-0.5 rounded text-xs text-white font-medium"
-          style={{ backgroundColor: statusColor[pkg.status] }}
+          style={{ backgroundColor: isOverdue(pkg) ? '#475569' : statusColor[pkg.status] }}
         >
           {statusLabel[pkg.status]}
         </span>
         <div className="flex-1 bg-slate-700 rounded-full h-1.5 overflow-hidden">
           <div
             className="h-full rounded-full transition-all"
-            style={{ width: `${pkg.progress}%`, backgroundColor: statusColor[pkg.status] }}
+            style={{ width: `${pkg.progress}%`, backgroundColor: getDisplayColor(pkg) }}
           />
         </div>
         <span className="text-xs text-slate-400">{pkg.progress}%</span>

@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { Package, MapMode } from '../types';
-import { statusColor } from '../utils/helpers';
+import { statusColor, isOverdue, getDisplayColor, overdueColor } from '../utils/helpers';
 import { Map, Satellite, ZoomIn, ZoomOut } from 'lucide-react';
 
 interface Props {
@@ -162,10 +162,10 @@ export default function MapView({ packages, selectedId, onSelect }: Props) {
                 key={`route-${pkg.id}`}
                 d={pathD}
                 fill="none"
-                stroke={statusColor[pkg.status]}
-                strokeWidth="0.3"
-                opacity="0.4"
-                strokeDasharray="1 0.5"
+                stroke={getDisplayColor(pkg)}
+                strokeWidth={isOverdue(pkg) ? '0.5' : '0.3'}
+                opacity={isOverdue(pkg) ? '0.7' : '0.4'}
+                strokeDasharray={isOverdue(pkg) ? '0.5 0.5' : '1 0.5'}
               />
             );
           })}
@@ -181,16 +181,28 @@ export default function MapView({ packages, selectedId, onSelect }: Props) {
                 onSelect(pkg);
               }}
             >
+              {isOverdue(pkg) && (
+                <circle
+                  r={selectedId === pkg.id ? 4 : 3.2}
+                  fill="none"
+                  stroke={overdueColor}
+                  strokeWidth="0.4"
+                  opacity="0.8"
+                >
+                  <animate attributeName="r" values={`${selectedId === pkg.id ? 4 : 3.2};${selectedId === pkg.id ? 5 : 4.2};${selectedId === pkg.id ? 4 : 3.2}`} dur="1.5s" repeatCount="indefinite" />
+                  <animate attributeName="opacity" values="0.8;0.3;0.8" dur="1.5s" repeatCount="indefinite" />
+                </circle>
+              )}
               <circle
                 r={selectedId === pkg.id ? 2.5 : 1.8}
-                fill={statusColor[pkg.status]}
+                fill={getDisplayColor(pkg)}
                 stroke="#0f172a"
                 strokeWidth="0.3"
                 opacity="0.9"
               >
                 <animate attributeName="r" values={`${selectedId === pkg.id ? 2.5 : 1.8};${selectedId === pkg.id ? 3.5 : 2.8};${selectedId === pkg.id ? 2.5 : 1.8}`} dur="2s" repeatCount="indefinite" />
               </circle>
-              <text y={-3} fontSize="2" fill={statusColor[pkg.status]} textAnchor="middle" fontWeight="bold">
+              <text y={-3} fontSize="2" fill={getDisplayColor(pkg)} textAnchor="middle" fontWeight="bold">
                 {pkg.id}
               </text>
             </g>

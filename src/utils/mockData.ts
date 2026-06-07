@@ -55,6 +55,15 @@ export function generatePackages(count: number): Package[] {
     const currentIndex = Math.min(Math.floor((progress / 100) * (route.length - 1)), route.length - 1);
     const pos = route[currentIndex];
 
+    let daysOffset: number;
+    if (status === 'delivered') {
+      daysOffset = -1;
+    } else if (Math.random() < 0.25) {
+      daysOffset = -Math.floor(Math.random() * 3) - 1;
+    } else {
+      daysOffset = Math.floor(Math.random() * 3) + 1;
+    }
+
     packages.push({
       id: `PKG${String(i + 1).padStart(4, '0')}`,
       trackingNo: `SF${Math.random().toString(36).substring(2, 10).toUpperCase()}`,
@@ -64,7 +73,7 @@ export function generatePackages(count: number): Package[] {
       destinationCity: toCity.name,
       status,
       progress: Math.round(progress),
-      estimatedDelivery: randomDate(status === 'delivered' ? -1 : Math.floor(Math.random() * 3) + 1),
+      estimatedDelivery: randomDate(daysOffset),
       x: pos.x,
       y: pos.y,
       route,

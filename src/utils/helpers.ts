@@ -1,4 +1,4 @@
-import { PackageStatus } from '../types';
+import { PackageStatus, Package } from '../types';
 
 export const statusColor: Record<PackageStatus, string> = {
   transit: '#3b82f6',
@@ -17,3 +17,26 @@ export const statusBg: Record<PackageStatus, string> = {
   delivered: 'bg-green-500',
   exception: 'bg-red-500',
 };
+
+export const overdueColor = '#f97316';
+export const overdueLabel = '已超时';
+export const overdueBg = 'bg-orange-500';
+
+export function isOverdue(pkg: Package): boolean {
+  if (pkg.status === 'delivered') return false;
+  const now = new Date();
+  const [month, day] = pkg.estimatedDelivery.split('/').map(Number);
+  const estimated = new Date(now.getFullYear(), month - 1, day);
+  estimated.setHours(23, 59, 59, 999);
+  return now > estimated;
+}
+
+export function getDisplayColor(pkg: Package): string {
+  if (isOverdue(pkg)) return overdueColor;
+  return statusColor[pkg.status];
+}
+
+export function getDisplayBg(pkg: Package): string {
+  if (isOverdue(pkg)) return overdueBg;
+  return statusBg[pkg.status];
+}

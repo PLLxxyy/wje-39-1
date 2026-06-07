@@ -1,5 +1,5 @@
 import { Package, FilterStatus } from '../types';
-import { statusColor, statusLabel, statusBg } from '../utils/helpers';
+import { statusColor, statusLabel, statusBg, isOverdue, getDisplayColor, getDisplayBg, overdueLabel } from '../utils/helpers';
 
 interface Props {
   packages: Package[];
@@ -50,9 +50,16 @@ export default function PackageList({ packages, filter, onFilterChange, onSelect
           >
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs font-mono text-slate-300">{pkg.trackingNo}</span>
-              <span className={`text-[10px] px-1.5 py-0.5 rounded text-white ${statusBg[pkg.status]}`}>
-                {statusLabel[pkg.status]}
-              </span>
+              <div className="flex gap-1">
+                {isOverdue(pkg) && (
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded text-white ${getDisplayBg(pkg)}`}>
+                    {overdueLabel}
+                  </span>
+                )}
+                <span className={`text-[10px] px-1.5 py-0.5 rounded text-white ${isOverdue(pkg) ? 'bg-slate-600' : statusBg[pkg.status]}`}>
+                  {statusLabel[pkg.status]}
+                </span>
+              </div>
             </div>
             <div className="text-xs text-slate-400 mb-2">
               {pkg.currentCity} → {pkg.destinationCity}
@@ -60,10 +67,13 @@ export default function PackageList({ packages, filter, onFilterChange, onSelect
             <div className="w-full bg-slate-700 rounded-full h-1.5 overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-500"
-                style={{ width: `${pkg.progress}%`, backgroundColor: statusColor[pkg.status] }}
+                style={{ width: `${pkg.progress}%`, backgroundColor: getDisplayColor(pkg) }}
               />
             </div>
-            <div className="text-[10px] text-slate-500 mt-1">进度 {pkg.progress}%</div>
+            <div className="flex justify-between mt-1">
+              <span className="text-[10px] text-slate-500">进度 {pkg.progress}%</span>
+              <span className="text-[10px] text-slate-500">预计送达 {pkg.estimatedDelivery}</span>
+            </div>
           </button>
         ))}
       </div>
